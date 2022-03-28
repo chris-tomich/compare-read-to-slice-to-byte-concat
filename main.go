@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-
+	Md5FileUsingReadToSlice()
+	Md5FileUsingByteConcat()
 }
 
 func Md5FileUsingReadToSlice() {
@@ -36,7 +37,7 @@ func Md5FileUsingReadToSlice() {
 	imageFrame := make([]byte, int64(len(imageNameBytes))+imageFileInfo.Size())
 	imageNameSlice := imageFrame[:len(imageNameBytes)]
 	imageDataSlice := imageFrame[len(imageNameBytes):]
-	copy(imageNameBytes, imageNameSlice)
+	copy(imageNameSlice, imageNameBytes)
 
 	bytesRead, err := image.Read(imageDataSlice)
 
@@ -50,6 +51,15 @@ func Md5FileUsingReadToSlice() {
 
 	_ = md5.Sum(imageFrame)
 	//fmt.Printf("%x\n", checksum)
+
+	// raw, err := os.Create("read_to_slice.bin")
+
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// defer raw.Close()
+	// raw.Write(imageFrame)
 }
 
 func Md5FileUsingByteConcat() {
@@ -74,6 +84,41 @@ func Md5FileUsingByteConcat() {
 
 	imageNameBytes := []byte("battle-of-fort-henry-1.jpg")
 	imageFrame := append(imageNameBytes, imageFileBytes...)
+
+	_ = md5.Sum(imageFrame)
+	//fmt.Printf("%x\n", checksum)
+
+	// raw, err := os.Create("byte_concat.bin")
+
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// defer raw.Close()
+	// raw.Write(imageFrame)
+}
+
+func Md5FileUsingByteConcatReversed() {
+	absImagePath, err := filepath.Abs("battle-of-fort-henry-1.jpg")
+
+	if err != nil {
+		panic(err)
+	}
+
+	image, err := os.Open(absImagePath)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer image.Close()
+	imageFileBytes, err := io.ReadAll(image)
+
+	if err != nil {
+		panic(err)
+	}
+
+	imageFrame := append(imageFileBytes, []byte("battle-of-fort-henry-1.jpg")...)
 
 	_ = md5.Sum(imageFrame)
 	//fmt.Printf("%x\n", checksum)
